@@ -1,5 +1,5 @@
 Package: future.batchtools
-Version: 0.7.0
+Version: 0.7.1
 Depends: R (>= 3.2.0), future (>= 1.8.1)
 Imports: batchtools (>= 0.9.8)
 Suggests: future.apply, listenv, markdown, R.rsp
@@ -13,15 +13,15 @@ Description: Implementation of the Future API on top of the 'batchtools' package
     in parallel out of the box, not only on your local machine or ad-hoc
     cluster of machines, but also via high-performance compute ('HPC') job
     schedulers such as 'LSF', 'OpenLava', 'Slurm', 'SGE', and 'TORQUE' / 'PBS',
-    e.g. 'y <- future_lapply(files, FUN = process)'.
+    e.g. 'y <- future.apply::future_lapply(files, FUN = process)'.
 License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.batchtools
 BugReports: https://github.com/HenrikBengtsson/future.batchtools/issues
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2018-05-03 21:55:47 UTC; hb
+Packaged: 2018-07-18 19:37:25 UTC; hb
 Author: Henrik Bengtsson [aut, cre, cph]
 Maintainer: Henrik Bengtsson <henrikb@braju.com>
 Repository: CRAN
-Date/Publication: 2018-05-04 04:18:39 UTC
+Date/Publication: 2018-07-18 21:30:07 UTC
