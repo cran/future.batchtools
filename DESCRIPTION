@@ -1,6 +1,6 @@
 Package: future.batchtools
-Version: 0.7.1
-Depends: R (>= 3.2.0), future (>= 1.8.1)
+Version: 0.7.2
+Depends: R (>= 3.2.0), future (>= 1.10.0)
 Imports: batchtools (>= 0.9.8)
 Suggests: future.apply, listenv, markdown, R.rsp
 VignetteBuilder: R.rsp
@@ -18,10 +18,10 @@ License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.batchtools
 BugReports: https://github.com/HenrikBengtsson/future.batchtools/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2018-07-18 19:37:25 UTC; hb
+Packaged: 2019-01-04 01:58:28 UTC; hb
 Author: Henrik Bengtsson [aut, cre, cph]
 Maintainer: Henrik Bengtsson <henrikb@braju.com>
 Repository: CRAN
-Date/Publication: 2018-07-18 21:30:07 UTC
+Date/Publication: 2019-01-04 13:50:15 UTC
