@@ -363,19 +363,30 @@ batchtools backends.</p>
 file that is used to generate the script used by the scheduler.
 This is what a template file for TORQUE / PBS may look like:</p>
 
-<pre><code class="sh">## Job name:
-#PBS -N &lt;%= job.name %&gt;
+<pre><code class="sh">#!/bin/bash
+
+## Job name:
+#PBS -N &lt;%= if (exists(&quot;job.name&quot;, mode = &quot;character&quot;)) job.name else job.hash %&gt;
+
+## Direct streams to logfile:
+#PBS -o &lt;%= log.file %&gt;
 
 ## Merge standard error and output:
 #PBS -j oe
 
-## Resource parameters:
-&lt;% for (name in names(resources)) { %&gt;
-#PBS -l &lt;%= name %&gt;=&lt;%= resources[[name]] %&gt;
+## Email on abort (a) and termination (e), but not when starting (b)
+#PBS -m ae
+
+## Resources needed:
+&lt;% if (length(resources) &gt; 0) {
+  opts &lt;- unlist(resources, use.names = TRUE)
+  opts &lt;- sprintf(&quot;%s=%s&quot;, names(opts), opts)
+  opts &lt;- paste(opts, collapse = &quot;,&quot;) %&gt;
+#PBS -l &lt;%= opts %&gt;
 &lt;% } %&gt;
 
-## Run R:
-R CMD BATCH --no-save --no-restore &quot;&lt;%= rscript %&gt;&quot; /dev/stdout
+## Launch R and evaluated the batchtools R job
+Rscript -e &#39;batchtools::doJobCollection(&quot;&lt;%= uri %&gt;&quot;)&#39;
 </code></pre>
 
 <p>If this template is saved to file <code>batchtools.torque.tmpl</code> (without period)
