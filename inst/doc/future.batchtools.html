@@ -3,118 +3,166 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
 <title>A Future for batchtools</title>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/styles/github.min.css">
-<script src="https://cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js" async></script>
-
-
-
 <style type="text/css">
-body, td {
-  font-family: sans-serif;
-  background-color: white;
-  font-size: 13px;
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
 }
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
 body {
+  font-family: sans-serif;
   max-width: 800px;
   margin: auto;
   padding: 1em;
   line-height: 1.5;
   box-sizing: border-box;
 }
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
 *, *:before, *:after {
   box-sizing: inherit;
 }
-tt, code, pre {
-  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
-}
-a:visited { color: #80007f; }
 pre, img { max-width: 100%; }
-code {
-  font-size: 92%;
-  border: 1px solid #ccc;
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
 }
-code[class] { background-color: #F8F8F8; }
-code.language-undefined { background-color: inherit; }
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
 table {
   margin: auto;
   border-top: 1px solid #666;
-  border-bottom: 1px solid #666;
 }
 table thead th { border-bottom: 1px solid #ddd; }
 th, td { padding: 5px; }
 thead, tfoot, tr:nth-child(even) { background: #eee; }
 blockquote {
-  color:#666;
-  margin:0;
+  color: #666;
+  margin: 0;
   padding-left: 1em;
-  border-left: 0.5em #eee solid;
+  border-left: 0.5em solid #eee;
 }
-hr { border: 1px #ddd dashed; }
+hr, .footnotes::before { border: 1px dashed #ddd; }
 .frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
 
 @media print {
-  * {
-    background: transparent !important;
-    color: black !important;
-    filter:none !important;
-  }
   body {
     font-size: 12pt;
     max-width: 100%;
   }
-  a, a:visited { text-decoration: underline; }
-  hr {
-    visibility: hidden;
-    page-break-before: always;
-  }
-  pre, blockquote {
-    padding-right: 1em;
-    page-break-inside: avoid;
-  }
   tr, img { page-break-inside: avoid; }
-  img { max-width: 100% !important; }
-  @page :left { margin: 15mm 20mm 15mm 10mm; }
-  @page :right { margin: 15mm 10mm 15mm 20mm; }
-  p, h2, h3 { orphans: 3; widows: 3; }
-  h2, h3 { page-break-after: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
 }
 </style>
-
 <meta name="keywords" content="R, package, vignette, future, synchronous, asynchronous, parallel, cluster, HPC, batchtools">
 <meta name="author" content="Henrik Bengtsson">
 </head>
-
 <body>
-<div class="include-before">
-
-</div>
-
 <div class="frontmatter">
 <div class="title"><h1>A Future for batchtools</h1></div>
 <div class="author"><h2></h2></div>
 <div class="date"><h3></h3></div>
 </div>
-
 <div class="body">
-<h1>A Future for batchtools</h1>
-<h2>Introduction</h2>
-<p>The <a href="https://cran.r-project.org/package=future">future</a> package provides a generic API for using futures in R.
-A future is a simple yet powerful mechanism to evaluate an R expression
-and retrieve its value at some point in time.  Futures can be resolved
-in many different ways depending on which strategy is used.
-There are various types of synchronous and asynchronous futures to
-choose from in the <a href="https://cran.r-project.org/package=future">future</a> package.</p>
-<p>This package, <a href="https://cran.r-project.org/package=future.batchtools">future.batchtools</a>, provides a type of futures that
-utilizes the <a href="https://cran.r-project.org/package=batchtools">batchtools</a> package.  This means that <em>any</em> type of
-backend that the batchtools package supports can be used as a future.
-More specifically, future.batchtools will allow you or users of your
-package to leverage the compute power of high-performance computing
-(HPC) clusters via a simple switch in settings - without having to
-change any code at all.</p>
-<p>For instance, if batchtools is properly configures, the below two
+<h1 id="a-future-for-batchtools">A Future for batchtools</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package provides a generic API for using futures in
+R.  A future is a simple yet powerful mechanism to evaluate an R
+expression and retrieve its value at some point in time.  Futures can
+be resolved in many different ways depending on which strategy is
+used.  There are various types of synchronous and asynchronous futures
+to choose from in the <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package.</p>
+<p>This package, <strong><a href="https://cran.r-project.org/package=future.batchtools">future.batchtools</a></strong>, provides a type of futures that
+utilizes the <strong><a href="https://cran.r-project.org/package=batchtools">batchtools</a></strong> package.  This means that <em>any</em> type of
+backend that the <strong>batchtools</strong> package supports can be used as a
+future.  More specifically, <strong>future.batchtools</strong> will allow you or
+users of your package to leverage the compute power of
+high-performance computing (HPC) clusters via a simple switch in
+settings - without having to change any code at all.</p>
+<p>For instance, if <strong>batchtools</strong> is properly configures, the below two
 expressions for futures <code>x</code> and <code>y</code> will be processed on two different
 compute nodes:</p>
 <pre><code class="language-r">&gt; library(&quot;future.batchtools&quot;)
@@ -125,8 +173,8 @@ compute nodes:</p>
 &gt; x + y
 [1] 5.85
 </code></pre>
-<p>This is obviously a toy example to illustrate what futures look like
-and how to work with them.</p>
+<p>This is just a toy example to illustrate what futures look like and
+how to work with them.</p>
 <p>A more realistic example comes from the field of cancer research
 where very large data FASTQ files, which hold a large number of short
 DNA sequence reads, are produced.  The first step toward a biological
@@ -170,16 +218,18 @@ for (ss in seq_along(fqs)) {
 ## Resolve the &quot;sample&quot; futures and return as a list
 bams &lt;- as.list(bams)
 </code></pre>
-<p>Note that a user who do not have access to a cluster could use the same script processing samples sequentially and chromosomes in parallel on a single machine using:</p>
+<p>Note that a user who do not have access to a cluster could use the
+same script processing samples sequentially and chromosomes in
+parallel on a single machine using:</p>
 <pre><code class="language-r">plan(list(sequential, multisession))
 </code></pre>
 <p>or samples in parallel and chromosomes sequentially using:</p>
 <pre><code class="language-r">plan(list(multisession, sequential))
 </code></pre>
 <p>For an introduction as well as full details on how to use futures,
-please consult the package vignettes of the <a href="https://cran.r-project.org/package=future">future</a> package.</p>
-<h2>Choosing batchtools backend</h2>
-<p>The future.batchtools package implements a generic future wrapper
+please consult the package vignettes of the <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package.</p>
+<h2 id="choosing-batchtools-backend">Choosing batchtools backend</h2>
+<p>The <strong>future.batchtools</strong> package implements a generic future wrapper
 for all batchtools backends.  Below are the most common types of
 batchtools backends.</p>
 <table>
@@ -222,11 +272,6 @@ batchtools backends.</p>
 <td align="left">N/A</td>
 </tr>
 <tr>
-<td align="left"><code>batchtools_interactive</code></td>
-<td align="left">sequential evaluation in the calling R environment</td>
-<td align="left"><code>plan(transparent)</code></td>
-</tr>
-<tr>
 <td align="left"><code>batchtools_multicore</code></td>
 <td align="left">parallel evaluation by forking the current R process</td>
 <td align="left"><code>plan(multicore)</code></td>
@@ -238,11 +283,15 @@ batchtools backends.</p>
 </tr>
 </tbody>
 </table>
-<h3>Examples</h3>
-<p>Below is an examples illustrating how to use <code>batchtools_torque</code> to configure the batchtools backend.  For further details and examples on how to configure batchtools, see the <a href="https://mllg.github.io/batchtools/articles/index.html">batchtools configuration</a> wiki page.</p>
-<p>To configure batchtools for job schedulers we need to setup a <code>*.tmpl</code> template
-file that is used to generate the script used by the scheduler.
-This is what a template file for TORQUE / PBS may look like:</p>
+<h3 id="examples">Examples</h3>
+<p>Below is an examples illustrating how to use <code>batchtools_torque</code> to
+configure the batchtools backend.  For further details and examples on
+how to configure batchtools, see the <a href="https://mllg.github.io/batchtools/articles/index.html">batchtools configuration</a> wiki
+page.</p>
+<p>To configure <strong>batchtools</strong> for job schedulers we need to setup a
+<code>*.tmpl</code> template file that is used to generate the script used by the
+scheduler.  This is what a template file for TORQUE / PBS may look
+like:</p>
 <pre><code class="language-sh">#!/bin/bash
 
 ## Job name:
@@ -268,50 +317,54 @@ This is what a template file for TORQUE / PBS may look like:</p>
 ## Launch R and evaluated the batchtools R job
 Rscript -e 'batchtools::doJobCollection(&quot;&lt;%= uri %&gt;&quot;)'
 </code></pre>
-<p>If this template is saved to file <code>batchtools.torque.tmpl</code> (without period)
-in the working directory or as <code>.batchtools.torque.tmpl</code> (with period) the
-user’s home directory, then it will be automatically located by the
-batchtools framework and loaded when doing:</p>
+<p>If this template is saved to file <code>batchtools.torque.tmpl</code> (without
+period) in the working directory or as <code>.batchtools.torque.tmpl</code> (with
+period) the user’s home directory, then it will be automatically
+located by the <strong>batchtools</strong> framework and loaded when doing:</p>
 <pre><code class="language-r">&gt; plan(batchtools_torque)
 </code></pre>
-<p>Resource parameters can be specified via argument <code>resources</code> which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of memory, use:</p>
+<p>Resource parameters can be specified via argument <code>resources</code> which
+should be a named list and is passed as is to the template file.  For
+example, to request that each job would get alloted 12 cores (one a
+single machine) and up to 5 GiB of memory, use:</p>
 <pre><code class="language-r">&gt; plan(batchtools_torque, resources = list(nodes = &quot;1:ppn=12&quot;, vmem = &quot;5gb&quot;))
 </code></pre>
-<p>To specify the <code>resources</code> argument at the same time as using nested future strategies, one can use <code>tweak()</code> to tweak the default arguments.  For instance,</p>
+<p>To specify the <code>resources</code> argument at the same time as using nested
+future strategies, one can use <code>tweak()</code> to tweak the default
+arguments.  For instance,</p>
 <pre><code class="language-r">plan(list(
   tweak(batchtools_torque, resources = list(nodes = &quot;1:ppn=12&quot;, vmem = &quot;5gb&quot;)),
   multisession
 ))
 </code></pre>
-<p>causes the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of memory per job.  The second level of futures will be evaluated using multisession using the 12 cores given to each job by the scheduler.</p>
-<p>A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named <code>./batchtools.slurm.tmpl</code> or <code>~/.batchtools.slurm.tmpl</code> in order for</p>
+<p>causes the first level of futures to be submitted via the TORQUE job
+scheduler requesting 12 cores and 5 GiB of memory per job.  The second
+level of futures will be evaluated using multisession using the 12
+cores given to each job by the scheduler.</p>
+<p>A similar filename format is used for the other types of job
+schedulers supported.  For instance, for Slurm the template file
+should be named <code>./batchtools.slurm.tmpl</code> or
+<code>~/.batchtools.slurm.tmpl</code> in order for</p>
 <pre><code class="language-r">&gt; plan(batchtools_slurm)
 </code></pre>
-<p>to locate the file automatically.  To specify this template file explicitly, use argument <code>template</code>, e.g.</p>
+<p>to locate the file automatically.  To specify this template file
+explicitly, use argument <code>template</code>, e.g.</p>
 <pre><code class="language-r">&gt; plan(batchtools_slurm, template = &quot;/path/to/batchtools.slurm.tmpl&quot;)
 </code></pre>
-<p>For further details and examples on how to configure batchtools per se, see the <a href="https://mllg.github.io/batchtools/articles/index.html">batchtools configuration</a> wiki page.</p>
-<h2>Demos</h2>
-<p>The <a href="https://cran.r-project.org/package=future">future</a> package provides a demo using futures for calculating a
-set of Mandelbrot planes.  The demo does not assume anything about
-what type of futures are used.
-<em>The user has full control of how futures are evaluated</em>.
-For instance, to use local batchtools futures, run the demo as:</p>
+<p>For further details and examples on how to configure <strong>batchtools</strong> per
+se, see the <a href="https://mllg.github.io/batchtools/articles/index.html">batchtools configuration</a> wiki page.</p>
+<h2 id="demos">Demos</h2>
+<p>The <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package provides a demo using futures for calculating
+a set of Mandelbrot planes.  The demo does not assume anything about
+what type of futures are used.  <em>The user has full control of how
+futures are evaluated</em>.  For instance, to use local batchtools
+futures, run the demo as:</p>
 <pre><code class="language-r">library(&quot;future.batchtools&quot;)
 plan(batchtools_local)
 demo(&quot;mandelbrot&quot;, package = &quot;future&quot;, ask = FALSE)
 </code></pre>
-
 </div>
-
-<div class="include-after">
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/combine/npm/@xiee/utils/js/center-img.min.js" async></script>
-<script>
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
 </body>
-
 </html>

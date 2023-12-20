@@ -294,6 +294,7 @@ loggedError <- function(...) UseMethod("loggedError")
 
 
 #' @importFrom batchtools getErrorMessages
+#' @rdname loggedOutput
 #' @export
 loggedError.BatchtoolsFuture <- function(future, ...) {
   stat <- status(future)
@@ -500,7 +501,9 @@ run.BatchtoolsFuture <- function(future, ...) {
     ## will have the same state of (loaded, attached) packages.
 
     reg$packages <- packages
-    saveRegistry(reg = reg)
+    with_stealth_rng({
+      saveRegistry(reg = reg)
+    })
 
     mdebugf("Attaching %d packages (%s) ... DONE",
                     length(packages), hpaste(sQuote(packages)))

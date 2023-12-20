@@ -1,4 +1,12 @@
-# Version 0.12.0 [2023-02-22]
+# Version 0.12.1 [2023-12-19]
+
+## Bug Fixes
+
+ * `plan(batchtools_multicore)` did not support `workers` argument
+   being a function.
+
+
+# Version 0.12.0 [2023-02-24]
 
 ## New Features
 
@@ -10,6 +18,11 @@
 
  * Improved performance of batchtools futures by making the removal of
    the **batchtools** registry about 10-15 times faster.
+
+## Bug Fixes
+
+ * `run()` for `BatchtoolsFuture` would update the RNG state, if the
+   future would attach packages.
 
 
 # Version 0.11.0 [2022-12-13]
@@ -71,8 +84,8 @@
    Because of this, we temporarily set `fs.latency = 1.0` (second)
    timeout for trying to find the log file.  This makes a big
    difference in case the template used a `--output=<path>` location
-   other than `--output=<%= log.file %>`l in such cases the log file
-   would not be found, requiring a timeout.
+   other than `--output=<%= log.file %>`. In such cases, the log file
+   would not be found, requiring a full timeout to complete.
 
 ## Bug Fixes
 
