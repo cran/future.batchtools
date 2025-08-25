@@ -107,7 +107,7 @@ section.footnotes {
   body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
 }
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.11/css/prism-xcode.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/css/prism-xcode.min.css">
 <meta name="keywords" content="R, package, vignette, future, synchronous, asynchronous, parallel, cluster, HPC, batchtools">
 <meta name="author" content="Henrik Bengtsson">
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
@@ -118,6 +118,35 @@ section.footnotes {
 </div>
 <div class="body">
 <h1 id="chp:a-future-for-batchtools">A Future for batchtools</h1>
+<h2 id="sec:tl-dr">TL;DR</h2>
+<p>Here is an example on how to evaluate R expressions on a Slurm
+high-performance compute (HPC) cluster from within R.</p>
+<pre><code class="language-r">library(future)
+
+# Limit runtime to 10 minutes and memory to 400 MiB per future,
+# request a parallel environment with four slots on a single host.
+# On this system, R is available via environment module 'r'. By
+# specifying 'r/4.5.1', 'module load r/4.5.1' will be added to
+# the submitted job script.
+plan(future.batchtools::batchtools_slurm, resources = list(
+  time = &quot;00:10:00&quot;, mem = &quot;400M&quot;, nodes = 1, ntasks = 4,
+  modules = c(&quot;r/4.5.1&quot;)
+))
+
+# Give it a spin
+f &lt;- future({
+  data.frame(
+    hostname = Sys.info()[[&quot;nodename&quot;]],
+          os = Sys.info()[[&quot;sysname&quot;]],
+       cores = unname(parallelly::availableCores()),
+     modules = Sys.getenv(&quot;LOADEDMODULES&quot;)
+  )
+})
+info &lt;- value(f)
+print(info)
+#&gt;   hostname    os cores  modules
+#&gt; 1      n12 Linux     4  r/4.5.1
+</code></pre>
 <h2 id="sec:introduction">Introduction</h2>
 <p>The <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package provides a generic API for using futures in
 R.  A future is a simple yet powerful mechanism to evaluate an R
@@ -132,76 +161,39 @@ future.  More specifically, <strong>future.batchtools</strong> will allow you or
 users of your package to leverage the compute power of
 high-performance computing (HPC) clusters via a simple switch in
 settings - without having to change any code at all.</p>
-<p>For instance, if <strong>batchtools</strong> is properly configures, the below two
-expressions for futures <code>x</code> and <code>y</code> will be processed on two different
-compute nodes:</p>
-<pre><code class="language-r">&gt; library(&quot;future.batchtools&quot;)
-&gt; plan(batchtools_torque)
-&gt;
-&gt; x %&lt;-% { Sys.sleep(5); 3.14 }
-&gt; y %&lt;-% { Sys.sleep(5); 2.71 }
-&gt; x + y
-[1] 5.85
+<p>For instance, the below two two future R expression will be processed
+by parallel R workers that launched on different compute nodes by the
+specified job scheduler:</p>
+<pre><code class="language-r">library(future)
+plan(future.batchtools::batchtools_slurm)
+
+f_x &lt;- future({ Sys.sleep(5); 3.14 })
+f_y &lt;- future({ Sys.sleep(5); 2.71 })
+x &lt;- value(f_x)
+y &lt;- value(f_y)
+x + y
+#&gt; [1] 5.85
 </code></pre>
 <p>This is just a toy example to illustrate what futures look like and
 how to work with them.</p>
-<p>A more realistic example comes from the field of cancer research
-where very large data FASTQ files, which hold a large number of short
-DNA sequence reads, are produced.  The first step toward a biological
-interpretation of these data is to align the reads in each sample
-(one FASTQ file) toward the human genome.  In order to speed this up,
-we can have each file be processed by a separate compute node and each
-node we can use 24 parallel processes such that each process aligns a
-separate chromosome.  Here is an outline of how this nested parallelism
-could be implemented using futures.</p>
-<pre><code class="language-r">library(&quot;future&quot;)
-library(&quot;listenv&quot;)
-## The first level of futures should be submitted to the
-## cluster using batchtools.  The second level of futures
-## should be using multisession, where the number of
-## parallel processes is automatically decided based on
-## what the cluster grants to each compute node.
-plan(list(batchtools_torque, multisession))
-
-## Find all samples (one FASTQ file per sample)
-fqs &lt;- dir(pattern = &quot;[.]fastq$&quot;)
-
-## The aligned results are stored in BAM files
-bams &lt;- listenv()
-
-## For all samples (FASTQ files) ...
-for (ss in seq_along(fqs)) {
-  fq &lt;- fqs[ss]
-
-  ## ... use futures to align them ...
-  bams[[ss]] %&lt;-% {
-    bams_ss &lt;- listenv()
-	## ... and for each FASTQ file use a second layer
-	## of futures to align the individual chromosomes
-    for (cc in 1:24) {
-      bams_ss[[cc]] %&lt;-% htseq::align(fq, chr = cc)
-    }
-	## Resolve the &quot;chromosome&quot; futures and return as a list
-    as.list(bams_ss)
-  }
-}
-## Resolve the &quot;sample&quot; futures and return as a list
-bams &lt;- as.list(bams)
-</code></pre>
-<p>Note that a user who do not have access to a cluster could use the
-same script processing samples sequentially and chromosomes in
-parallel on a single machine using:</p>
-<pre><code class="language-r">plan(list(sequential, multisession))
-</code></pre>
-<p>or samples in parallel and chromosomes sequentially using:</p>
-<pre><code class="language-r">plan(list(multisession, sequential))
-</code></pre>
 <p>For an introduction as well as full details on how to use futures,
-please consult the package vignettes of the <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package.</p>
-<h2 id="sec:choosing-batchtools-backend">Choosing batchtools backend</h2>
+please see <a href="https://www.futureverse.org">https://www.futureverse.org</a> or consult the package
+vignettes of the <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package.</p>
+<h2 id="sec:demos">Demos</h2>
+<p>The <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package provides a demo using futures for calculating
+a set of Mandelbrot planes.  The demo does not assume anything about
+what type of futures are used.  <em>The user has full control of how
+futures are evaluated</em>.  For instance, to use local batchtools
+futures, run the demo as:</p>
+<pre><code class="language-r">library(future)
+plan(future.batchtools::batchtools_local)
+demo(&quot;mandelbrot&quot;, package = &quot;future&quot;, ask = FALSE)
+</code></pre>
+<h2 id="sec:available-batchtools-backend">Available batchtools backend</h2>
 <p>The <strong>future.batchtools</strong> package implements a generic future wrapper
 for all batchtools backends.  Below are the most common types of
-batchtools backends.</p>
+batchtools backends. For other types of parallel and distributed
+backends, please see <a href="https://www.futureverse.org/backends.html">https://www.futureverse.org/backends.html</a>.</p>
 <table>
 <thead>
 <tr>
@@ -212,8 +204,18 @@ batchtools backends.</p>
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>batchtools_torque</code></td>
-<td align="left">Futures are evaluated via a <a href="https://en.wikipedia.org/wiki/TORQUE">TORQUE</a> / PBS job scheduler</td>
+<td align="left"><code>batchtools_lsf</code></td>
+<td align="left">Futures are evaluated via a <a href="https://en.wikipedia.org/wiki/Platform_LSF">Load Sharing Facility (LSF)</a> job scheduler</td>
+<td align="left">N/A</td>
+</tr>
+<tr>
+<td align="left"><code>batchtools_openlava</code></td>
+<td align="left">Futures are evaluated via an <a href="https://en.wikipedia.org/wiki/OpenLava">OpenLava</a> job scheduler</td>
+<td align="left">N/A</td>
+</tr>
+<tr>
+<td align="left"><code>batchtools_sge</code></td>
+<td align="left">Futures are evaluated via a <a href="https://en.wikipedia.org/wiki/Oracle_Grid_Engine">Sun/Son of/Oracle/Univa/Altair Grid Engine (SGE)</a> job scheduler</td>
 <td align="left">N/A</td>
 </tr>
 <tr>
@@ -222,18 +224,8 @@ batchtools backends.</p>
 <td align="left">N/A</td>
 </tr>
 <tr>
-<td align="left"><code>batchtools_sge</code></td>
-<td align="left">Futures are evaluated via a <a href="https://en.wikipedia.org/wiki/Oracle_Grid_Engine">Sun/Oracle Grid Engine (SGE)</a> job scheduler</td>
-<td align="left">N/A</td>
-</tr>
-<tr>
-<td align="left"><code>batchtools_lsf</code></td>
-<td align="left">Futures are evaluated via a <a href="https://en.wikipedia.org/wiki/Platform_LSF">Load Sharing Facility (LSF)</a> job scheduler</td>
-<td align="left">N/A</td>
-</tr>
-<tr>
-<td align="left"><code>batchtools_openlava</code></td>
-<td align="left">Futures are evaluated via an <a href="https://en.wikipedia.org/wiki/OpenLava">OpenLava</a> job scheduler</td>
+<td align="left"><code>batchtools_torque</code></td>
+<td align="left">Futures are evaluated via a <a href="https://en.wikipedia.org/wiki/TORQUE">TORQUE</a> / PBS job scheduler</td>
 <td align="left">N/A</td>
 </tr>
 <tr>
@@ -249,90 +241,10 @@ batchtools backends.</p>
 <tr>
 <td align="left"><code>batchtools_local</code></td>
 <td align="left">sequential evaluation in a separate R process (on current machine)</td>
-<td align="left"><code>plan(cluster, workers = &quot;localhost&quot;)</code></td>
+<td align="left"><code>plan(cluster, workers = I(1))</code></td>
 </tr>
 </tbody>
 </table>
-<h3 id="sec:examples">Examples</h3>
-<p>Below is an examples illustrating how to use <code>batchtools_torque</code> to
-configure the batchtools backend.  For further details and examples on
-how to configure batchtools, see the <a href="https://batchtools.mlr-org.com/articles/batchtools.html">batchtools configuration</a> wiki
-page.</p>
-<p>To configure <strong>batchtools</strong> for job schedulers we need to setup a
-<code>*.tmpl</code> template file that is used to generate the script used by the
-scheduler.  This is what a template file for TORQUE / PBS may look
-like:</p>
-<pre><code class="language-sh">#!/bin/bash
-
-## Job name:
-#PBS -N &lt;%= if (exists(&quot;job.name&quot;, mode = &quot;character&quot;)) job.name else job.hash %&gt;
-
-## Direct streams to logfile:
-#PBS -o &lt;%= log.file %&gt;
-
-## Merge standard error and output:
-#PBS -j oe
-
-## Email on abort (a) and termination (e), but not when starting (b)
-#PBS -m ae
-
-## Resources needed:
-&lt;% if (length(resources) &gt; 0) {
-  opts &lt;- unlist(resources, use.names = TRUE)
-  opts &lt;- sprintf(&quot;%s=%s&quot;, names(opts), opts)
-  opts &lt;- paste(opts, collapse = &quot;,&quot;) %&gt;
-#PBS -l &lt;%= opts %&gt;
-&lt;% } %&gt;
-
-## Launch R and evaluated the batchtools R job
-Rscript -e 'batchtools::doJobCollection(&quot;&lt;%= uri %&gt;&quot;)'
-</code></pre>
-<p>If this template is saved to file <code>batchtools.torque.tmpl</code> (without
-period) in the working directory or as <code>.batchtools.torque.tmpl</code> (with
-period) the user’s home directory, then it will be automatically
-located by the <strong>batchtools</strong> framework and loaded when doing:</p>
-<pre><code class="language-r">&gt; plan(batchtools_torque)
-</code></pre>
-<p>Resource parameters can be specified via argument <code>resources</code> which
-should be a named list and is passed as is to the template file.  For
-example, to request that each job would get alloted 12 cores (one a
-single machine) and up to 5 GiB of memory, use:</p>
-<pre><code class="language-r">&gt; plan(batchtools_torque, resources = list(nodes = &quot;1:ppn=12&quot;, vmem = &quot;5gb&quot;))
-</code></pre>
-<p>To specify the <code>resources</code> argument at the same time as using nested
-future strategies, one can use <code>tweak()</code> to tweak the default
-arguments.  For instance,</p>
-<pre><code class="language-r">plan(list(
-  tweak(batchtools_torque, resources = list(nodes = &quot;1:ppn=12&quot;, vmem = &quot;5gb&quot;)),
-  multisession
-))
-</code></pre>
-<p>causes the first level of futures to be submitted via the TORQUE job
-scheduler requesting 12 cores and 5 GiB of memory per job.  The second
-level of futures will be evaluated using multisession using the 12
-cores given to each job by the scheduler.</p>
-<p>A similar filename format is used for the other types of job
-schedulers supported.  For instance, for Slurm the template file
-should be named <code>./batchtools.slurm.tmpl</code> or
-<code>~/.batchtools.slurm.tmpl</code> in order for</p>
-<pre><code class="language-r">&gt; plan(batchtools_slurm)
-</code></pre>
-<p>to locate the file automatically.  To specify this template file
-explicitly, use argument <code>template</code>, e.g.</p>
-<pre><code class="language-r">&gt; plan(batchtools_slurm, template = &quot;/path/to/batchtools.slurm.tmpl&quot;)
-</code></pre>
-<p>For further details and examples on how to configure <strong>batchtools</strong> per
-se, see the <a href="https://batchtools.mlr-org.com/articles/batchtools.html">batchtools configuration</a> wiki page.</p>
-<h2 id="sec:demos">Demos</h2>
-<p>The <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package provides a demo using futures for calculating
-a set of Mandelbrot planes.  The demo does not assume anything about
-what type of futures are used.  <em>The user has full control of how
-futures are evaluated</em>.  For instance, to use local batchtools
-futures, run the demo as:</p>
-<pre><code class="language-r">library(&quot;future.batchtools&quot;)
-plan(batchtools_local)
-demo(&quot;mandelbrot&quot;, package = &quot;future&quot;, ask = FALSE)
-</code></pre>
 </div>
 </body>
 </html>

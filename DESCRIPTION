@@ -1,7 +1,7 @@
 Package: future.batchtools
-Version: 0.12.2
-Depends: R (>= 3.2.0), parallelly, future (>= 1.49.0)
-Imports: batchtools (>= 0.9.16), utils
+Version: 0.20.0
+Depends: R (>= 3.2.0), parallelly, future (>= 1.58.0)
+Imports: batchtools (>= 0.9.17), utils
 Suggests: globals, future.apply, listenv, markdown, R.rsp
 VignetteBuilder: R.rsp
 Title: A Future API for Parallel and Distributed Processing using
@@ -21,11 +21,13 @@ LazyLoad: TRUE
 URL: https://future.batchtools.futureverse.org,
         https://github.com/futureverse/future.batchtools
 BugReports: https://github.com/futureverse/future.batchtools/issues
+Language: en-US
+Encoding: UTF-8
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-06-06 02:24:53 UTC; henrik
+Packaged: 2025-08-25 22:31:36 UTC; hb
 Author: Henrik Bengtsson [aut, cre, cph] (ORCID:
     <https://orcid.org/0000-0002-7579-5165>)
 Maintainer: Henrik Bengtsson <henrikb@braju.com>
 Repository: CRAN
-Date/Publication: 2025-06-06 02:50:02 UTC
+Date/Publication: 2025-08-25 22:50:02 UTC
