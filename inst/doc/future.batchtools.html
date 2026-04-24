@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<meta name="generator" content="litedown 0.7">
+<meta name="generator" content="litedown 0.9">
 <title></title>
 <style type="text/css">
 body {
@@ -107,11 +107,9 @@ section.footnotes {
   body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
 }
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/css/prism-xcode.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.21/css/prism-xcode.min.css">
 <meta name="keywords" content="R, package, vignette, future, synchronous, asynchronous, parallel, cluster, HPC, batchtools">
 <meta name="author" content="Henrik Bengtsson">
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
 </head>
 <body>
 <div class="frontmatter">
@@ -119,18 +117,18 @@ section.footnotes {
 <div class="body">
 <h1 id="chp:a-future-for-batchtools">A Future for batchtools</h1>
 <h2 id="sec:tl-dr">TL;DR</h2>
-<p>Here is an example on how to evaluate R expressions on a Slurm
-high-performance compute (HPC) cluster from within R.</p>
+<p>Here is an example of how to evaluate R expressions on a Slurm
+high-performance computing (HPC) cluster from within R.</p>
 <pre><code class="language-r">library(future)
 
 # Limit runtime to 10 minutes and memory to 400 MiB per future,
 # request a parallel environment with four slots on a single host.
 # On this system, R is available via environment module 'r'. By
-# specifying 'r/4.5.1', 'module load r/4.5.1' will be added to
+# specifying 'r/4.5', 'module load r/4.5' will be added to
 # the submitted job script.
 plan(future.batchtools::batchtools_slurm, resources = list(
   time = &quot;00:10:00&quot;, mem = &quot;400M&quot;, nodes = 1, ntasks = 4,
-  modules = c(&quot;r/4.5.1&quot;)
+  modules = c(&quot;r/4.5&quot;)
 ))
 
 # Give it a spin
@@ -145,7 +143,7 @@ f &lt;- future({
 info &lt;- value(f)
 print(info)
 #&gt;   hostname    os cores  modules
-#&gt; 1      n12 Linux     4  r/4.5.1
+#&gt; 1      n12 Linux     4  r/4.5.2
 </code></pre>
 <h2 id="sec:introduction">Introduction</h2>
 <p>The <strong><a href="https://cran.r-project.org/package=future">future</a></strong> package provides a generic API for using futures in
@@ -161,8 +159,8 @@ future.  More specifically, <strong>future.batchtools</strong> will allow you or
 users of your package to leverage the compute power of
 high-performance computing (HPC) clusters via a simple switch in
 settings - without having to change any code at all.</p>
-<p>For instance, the below two two future R expression will be processed
-by parallel R workers that launched on different compute nodes by the
+<p>For instance, the following two future R expressions will be processed
+by parallel R workers launched on different compute nodes by the
 specified job scheduler:</p>
 <pre><code class="language-r">library(future)
 plan(future.batchtools::batchtools_slurm)
@@ -189,7 +187,7 @@ futures, run the demo as:</p>
 plan(future.batchtools::batchtools_local)
 demo(&quot;mandelbrot&quot;, package = &quot;future&quot;, ask = FALSE)
 </code></pre>
-<h2 id="sec:available-batchtools-backend">Available batchtools backend</h2>
+<h2 id="sec:available-batchtools-backends">Available batchtools backends</h2>
 <p>The <strong>future.batchtools</strong> package implements a generic future wrapper
 for all batchtools backends.  Below are the most common types of
 batchtools backends. For other types of parallel and distributed
@@ -246,5 +244,7 @@ backends, please see <a href="https://www.futureverse.org/backends.html">https:/
 </tbody>
 </table>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
 </body>
 </html>
